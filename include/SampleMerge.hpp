@@ -34,7 +34,7 @@ struct AlignedBuckets {
 };
 
 // --------------------------------------------------------------------------
-// CÓDIGO SIMD (Ya corregido y robusto)
+// CÓDIGO SIMD
 // --------------------------------------------------------------------------
 HWY_BEFORE_NAMESPACE();
 namespace hwy {
@@ -42,7 +42,7 @@ namespace HWY_NAMESPACE {
 namespace hn = hwy::HWY_NAMESPACE;
 
 // --------------------------------------------------------------------------
-// GRID K-WAY MERGE V6: Prefetching & Latency Hiding
+// GRID K-WAY MERGE V6 con prefetch
 // --------------------------------------------------------------------------
 template <unsigned int THREADS, typename T>
 void grid_k_way_merge(T* out_ptr, const std::array<ClassifiedRun<T>, THREADS * THREADS>& runs, unsigned int bucketId, T* base_ptr) {
@@ -125,7 +125,6 @@ void grid_k_way_merge(T* out_ptr, const std::array<ClassifiedRun<T>, THREADS * T
             // __builtin_prefetch(addr, rw, locality): rw=0(read), locality=3(high temporal)
             if (HWY_LIKELY(source_idx < THREADS)) { // Check estático para compilador
                 //hwy::PrefetchT0(cursors[source_idx] + 4); 
-                // Si HWY no tiene Prefetch escalar accesible, usa:
                 __builtin_prefetch(cursors[source_idx] + 4, 0, 3);
             }
             
@@ -197,12 +196,11 @@ void parallel_grid_merge(AlignedBuckets<THREADS, T>& buckets,
 }
 
 // --------------------------------------------------------------------------
-// CÓDIGO HOST (CORREGIDO: Partición Exacta)
+// CÓDIGO HOST
 // --------------------------------------------------------------------------
 
 namespace hn = hwy::HWY_NAMESPACE;
 
-// CORRECCIÓN 1: Partición exacta usando (i*N)/T para no perder la cola del array
 template <unsigned int THREADS, typename T>
 void sortBlocksExact(T* start, size_t total_n) {
     #pragma omp parallel for schedule(static)
@@ -216,7 +214,6 @@ void sortBlocksExact(T* start, size_t total_n) {
     }
 }
 
-// CORRECCIÓN 2: Obtener pivots basándose en las mismas particiones exactas
 template <unsigned int THREADS, typename T>
 inline std::array<T, THREADS - 1> getPivotsExact(T* start, size_t total_n) {
     std::array<T, THREADS - 1> pivots;
@@ -246,7 +243,6 @@ inline std::array<T, THREADS - 1> getPivotsExact(T* start, size_t total_n) {
     return pivots;
 }
 
-// CORRECCIÓN 3: Clasificación usando particiones exactas
 template<unsigned int THREADS, typename T>
 std::array<ClassifiedRun<T>, THREADS*THREADS> classifyElementsExact(T* start, size_t total_n, const std::array<T, THREADS-1> &pivots) {
     std::array<ClassifiedRun<T>, THREADS*THREADS> classifiedRuns;
@@ -427,5 +423,6 @@ SMTimeMetrics sampleMerge(T* start, T* end) {
         .copybackTime = std::chrono::duration<double>(copybackDuration).count()
     };
 }
+
 
 #endif // SAMPLE_MERGE_HPP
