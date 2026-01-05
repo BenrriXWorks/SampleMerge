@@ -1,9 +1,13 @@
+### Introducción
+
 Implementación header only de framework de merge basado en Samplesort y Mergesort como estratégia de paralelización genérica aprovechando instrucciones vectorizadas de highway para fusionar eficientemente.
 
 Memoria: O(n)
 Complejidad: O(n/p log n/p)
 
-Resultados actuales (Ryzen 5 5600X, 16gb ddr4 3600mhz):
+### Benchmark
+
+Resultados actuales (Ryzen 5 5600X 6-cores, 16gb ddr4 3600mhz):
 
 ```r
 03:16:10 root@DESKTOP-O8GELGC build → ./main
@@ -29,14 +33,43 @@ SampleMerge(48): 766.357 ms | sort=314.676 pivot=0.592 class=1.469 bucket=0.192 
 SampleMerge(64): 855.074 ms | sort=301.640 pivot=1.038 class=1.823 bucket=0.257 merge=467.721 copyback=82.456 ms
 ```
 
+Benchmark para Intel Core i5-1135G7, 8gb ddr4.
+```r
+11:27:18 root@NB-BenjaminParra build ±|main ✗|→ ./main
+OK: correctitud
+
+Timing N=200000013
+std::sort (par_unseq):   8216.909 ms
+SampleMerge(1): 1614.995 ms | sort=1614.968 pivot=0.000 class=0.000 bucket=0.000 merge=0.000 copyback=0.000 ms
+SampleMerge(2): 1837.199 ms | sort=615.438 pivot=0.000 class=0.000 bucket=0.000 merge=1174.155 copyback=46.785 ms
+SampleMerge(3): 1646.742 ms | sort=583.026 pivot=0.136 class=0.015 bucket=0.050 merge=1021.319 copyback=41.531 ms
+SampleMerge(4): 1244.400 ms | sort=487.919 pivot=0.021 class=0.012 bucket=0.203 merge=717.524 copyback=34.776 ms
+SampleMerge(6): 1022.424 ms | sort=434.165 pivot=0.009 class=0.029 bucket=0.140 merge=551.028 copyback=36.135 ms
+SampleMerge(7): 961.126 ms | sort=366.798 pivot=1.013 class=0.027 bucket=0.083 merge=558.208 copyback=34.325 ms
+SampleMerge(8): 979.159 ms | sort=415.990 pivot=0.131 class=0.025 bucket=0.102 merge=519.305 copyback=43.296 ms
+SampleMerge(9): 1248.458 ms | sort=591.750 pivot=0.257 class=0.333 bucket=0.089 merge=618.087 copyback=37.238 ms
+SampleMerge(10): 1167.842 ms | sort=372.150 pivot=0.398 class=0.458 bucket=0.096 merge=758.774 copyback=34.615 ms
+SampleMerge(11): 1136.181 ms | sort=378.266 pivot=0.170 class=0.475 bucket=0.166 merge=715.999 copyback=40.744 ms
+SampleMerge(12): 1195.716 ms | sort=370.931 pivot=0.419 class=0.414 bucket=0.067 merge=778.327 copyback=41.430 ms
+SampleMerge(16): 1202.238 ms | sort=385.608 pivot=0.683 class=0.805 bucket=0.105 merge=780.842 copyback=33.538 ms
+SampleMerge(32): 936.392 ms | sort=280.279 pivot=0.650 class=0.618 bucket=0.207 merge=621.280 copyback=33.149 ms
+SampleMerge(36): 1164.664 ms | sort=326.609 pivot=0.916 class=1.257 bucket=0.352 merge=792.035 copyback=43.252 ms
+SampleMerge(48): 1206.880 ms | sort=327.679 pivot=0.563 class=1.273 bucket=0.378 merge=842.905 copyback=33.743 ms
+SampleMerge(64): 1155.816 ms | sort=292.576 pivot=2.044 class=2.696 bucket=3.105 merge=812.776 copyback=38.672 ms
+```
+
+### Estratégia
+
 Resumen de estratégia actual:
-1. Ordena segmentos de tamaño ~n/THREADS con un algoritmo lineal optimo.
+1. Ordena segmentos de tamaño ~n/THREADS con un algoritmo lineal optimo. En este caso usa VQSort.
 2. Toma los elementos de las posiciones n/THREADS * segment_id + n/(THREADS^2) * CANDIDATE_ID como candidatos aprovechando el gran orden como heuristica.
 3. Selecciona la mediana para cada candidato, quedando THREADS-1 Pivotes.
 4. Busqueda binaria de cuantos elementos corresponderian a cada bucket dentro de cada segmento y creacion de los buckets de manera alineada en memoria. Actualmente se crea un arreglo grande con padding de infinitos de |LANES_SIMD| + E, donde E es lo necesario para alinear el siguiente bucket. 
 5. Guardar los punteros del inicio y el largo de cada run clasificada a un bucket determinado y guardarlo en un arreglo.
 6. Fusionar las runs en el bucket correspondiente. La estratégia actual es hacer un minimo vertical por la cantidad de registros SIMD necesarias para almacenar todas las cabezas de las runs junto con una mascara para determinar cual registro y en que posicion fue, reduciendo con un minimo horizontal para obtener el elemento menor en cada iteración y copiandolo a un buffer alineado. Al llenarse el buffer se hace streaming para no contaminar la cache. Esta estratégia permite escalar a un numero arbitrario de runs.
 7. Copiar los buckets de vuelta al arreglo original y lanzar un thread para destruir el arreglo qeu contiene los buckets para limpiar.
+
+### Compilación
 
 Para compilar se necesita cmake, build-essential y make.
 Los pasos para la primera compilación son:
@@ -45,6 +78,8 @@ cd build
 cmake ..
 make
 
-Y luego la ejecución del entorno del test es ./main
-
 Tomar en cuenta que compilar VQSort toma algunos minutos
+
+### Ejecución del benchmark
+
+Y luego la ejecución del entorno del test es ./main
