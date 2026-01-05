@@ -37,3 +37,14 @@ Resumen de estratégia actual:
 5. Guardar los punteros del inicio y el largo de cada run clasificada a un bucket determinado y guardarlo en un arreglo.
 6. Fusionar las runs en el bucket correspondiente. La estratégia actual es hacer un minimo vertical por la cantidad de registros SIMD necesarias para almacenar todas las cabezas de las runs junto con una mascara para determinar cual registro y en que posicion fue, reduciendo con un minimo horizontal para obtener el elemento menor en cada iteración y copiandolo a un buffer alineado. Al llenarse el buffer se hace streaming para no contaminar la cache. Esta estratégia permite escalar a un numero arbitrario de runs.
 7. Copiar los buckets de vuelta al arreglo original y lanzar un thread para destruir el arreglo qeu contiene los buckets para limpiar.
+
+Para compilar se necesita cmake, build-essential y make.
+Los pasos para la primera compilación son:
+mkdir build
+cd build
+cmake ..
+make
+
+Y luego la ejecución del entorno del test es ./main
+
+Tomar en cuenta que compilar VQSort toma algunos minutos
