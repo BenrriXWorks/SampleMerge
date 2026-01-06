@@ -11,7 +11,7 @@ Benchmark para AMD Ryzen™ Threadripper™ PRO 5975WX 32-Cores, AVX512, DDR4 12
 
 ```r
 Timing N=200000013
-std::sort (par_unseq):   699.389 ms
+std::sort (par_unseq, TBB):   699.389 ms
 SampleMerge(1): 1085.054 ms | sort=1085.054 pivot=0.000 class=0.000 bucket=0.000 merge=0.000 copyback=0.000 ms
 SampleMerge(2): 1007.928 ms | sort=582.736 pivot=0.000 class=0.000 bucket=0.000 merge=380.301 copyback=44.842 ms
 SampleMerge(3): 1226.763 ms | sort=423.667 pivot=0.011 class=0.003 bucket=0.257 merge=760.237 copyback=42.530 ms
@@ -108,3 +108,4 @@ Tomar en cuenta que compilar VQSort toma algunos minutos
 
 
 Y luego la ejecución del entorno del test es ./main
+
