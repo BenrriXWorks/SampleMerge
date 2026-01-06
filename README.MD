@@ -7,7 +7,31 @@ Complejidad: O(n/p log n/p)
 
 ### Benchmark
 
-Resultados actuales (Ryzen 5 5600X 6-cores, 16gb ddr4 3600mhz):
+Benchmark para AMD Ryzen™ Threadripper™ PRO 5975WX 32-Cores, AVX512, DDR4 128GB 3200mhz:
+
+```r
+Timing N=200000013
+std::sort (par_unseq):   699.389 ms
+SampleMerge(1): 1085.054 ms | sort=1085.054 pivot=0.000 class=0.000 bucket=0.000 merge=0.000 copyback=0.000 ms
+SampleMerge(2): 1007.928 ms | sort=582.736 pivot=0.000 class=0.000 bucket=0.000 merge=380.301 copyback=44.842 ms
+SampleMerge(3): 1226.763 ms | sort=423.667 pivot=0.011 class=0.003 bucket=0.257 merge=760.237 copyback=42.530 ms
+SampleMerge(4): 946.869 ms | sort=327.278 pivot=0.009 class=0.006 bucket=0.366 merge=576.421 copyback=42.726 ms
+SampleMerge(6): 697.714 ms | sort=264.750 pivot=0.015 class=0.014 bucket=0.569 merge=389.720 copyback=42.566 ms
+SampleMerge(7): 644.638 ms | sort=262.878 pivot=0.461 class=0.019 bucket=0.696 merge=338.013 copyback=42.491 ms
+SampleMerge(8): 611.535 ms | sort=267.279 pivot=1.470 class=0.025 bucket=0.774 merge=299.404 copyback=42.507 ms
+SampleMerge(9): 597.219 ms | sort=228.481 pivot=0.028 class=0.033 bucket=0.902 merge=329.987 copyback=37.715 ms
+SampleMerge(10): 542.625 ms | sort=204.387 pivot=3.473 class=0.035 bucket=0.999 merge=299.522 copyback=34.133 ms
+SampleMerge(11): 496.274 ms | sort=185.749 pivot=2.036 class=0.041 bucket=1.098 merge=276.284 copyback=30.979 ms
+SampleMerge(12): 470.916 ms | sort=157.210 pivot=5.628 class=4.946 bucket=1.232 merge=269.759 copyback=31.961 ms
+SampleMerge(16): 345.356 ms | sort=121.099 pivot=1.439 class=0.063 bucket=1.728 merge=194.799 copyback=26.117 ms
+SampleMerge(32): 258.465 ms | sort=74.182 pivot=6.999 class=6.024 bucket=3.185 merge=140.187 copyback=27.801 ms
+SampleMerge(36): 261.276 ms | sort=77.566 pivot=8.808 class=7.384 bucket=3.123 merge=138.202 copyback=26.124 ms
+SampleMerge(48): 234.888 ms | sort=62.736 pivot=0.252 class=0.660 bucket=4.801 merge=144.934 copyback=21.411 ms
+SampleMerge(64): 225.888 ms | sort=55.334 pivot=0.367 class=0.826 bucket=6.672 merge=141.162 copyback=21.413 ms
+SampleMerge(128): 267.779 ms | sort=45.463 pivot=0.485 class=1.666 bucket=12.736 merge=186.170 copyback=21.167 ms
+```
+
+Benchmark para Ryzen 5 5600X 6-cores, AVX2, 16gb ddr4 3600mhz:
 
 ```r
 03:16:10 root@DESKTOP-O8GELGC build → ./main
@@ -33,7 +57,7 @@ SampleMerge(48): 766.357 ms | sort=314.676 pivot=0.592 class=1.469 bucket=0.192 
 SampleMerge(64): 855.074 ms | sort=301.640 pivot=1.038 class=1.823 bucket=0.257 merge=467.721 copyback=82.456 ms
 ```
 
-Benchmark para Intel Core i5-1135G7, 8gb ddr4.
+Benchmark para Intel Core i5-1135G7 4 cores, AVX512, 8gb ddr4.
 ```r
 11:27:18 root@NB-BenjaminParra build ±|main ✗|→ ./main
 OK: correctitud
@@ -81,5 +105,6 @@ make
 Tomar en cuenta que compilar VQSort toma algunos minutos
 
 ### Ejecución del benchmark
+
 
 Y luego la ejecución del entorno del test es ./main
