@@ -97,10 +97,13 @@ Resumen de estratégia actual:
 
 Para compilar se necesita cmake, build-essential y make.
 Los pasos para la primera compilación son:
+
+```bash
 mkdir build
 cd build
 cmake ..
 make
+```
 
 Tomar en cuenta que compilar VQSort toma algunos minutos
 
@@ -108,4 +111,5 @@ Tomar en cuenta que compilar VQSort toma algunos minutos
 
 
 Y luego la ejecución del entorno del test es ./main
+
 
